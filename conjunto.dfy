@@ -17,9 +17,9 @@ class Conjunto {
     ensures ConjuntoValido();
     ensures fresh(lista);
     {
-        lista := new int[10] ;
-        n := 0 ;
-        conjunto := {} ;
+        lista := new int[10];
+        n := 0;
+        conjunto := {};
     }
 
 
@@ -36,15 +36,16 @@ class Conjunto {
             // copy all elements from a into anew
             var i:nat := 0;
             while (i < n)
-                invariant i <= n;
-                invariant forall j:nat :: j<i ==> anew[j] == lista[j];
-                modifies anew;
-                {
-                    anew[i] := lista[i];
-                    i := i + 1 ;
-                }
+            decreases n - i
+            invariant i <= n;
+            invariant forall j:nat :: j<i ==> anew[j] == lista[j];
+            modifies anew;
+            {
+                anew[i] := lista[i];
+                i := i + 1 ;
+            }
             
-                lista := anew;
+            lista := anew;
         }
 
     method contains(x:nat) returns (b:bool)
@@ -54,14 +55,15 @@ class Conjunto {
         {
             var i:nat := 0;
             while (i < n)
-                invariant i <= n;
-                invariant (forall j:nat :: j<i ==> lista[j] != x);
-                {
-                    if (lista[i] == x) {
-                        return true;
-                    }
-                    i := i + 1;
+            decreases n - i
+            invariant i <= n
+            invariant (forall j:nat :: j<i ==> lista[j] != x)
+            {
+                if (lista[i] == x) {
+                    return true;
                 }
+                i := i + 1;
+            }
             return false;
         }
 
@@ -73,9 +75,10 @@ class Conjunto {
         {
             var i:nat := 0;
             while (i < n)
-                invariant i <= n;
-                invariant forall j:nat :: j<i ==> lista[j] != x;
-                invariant ConjuntoValido();
+            decreases n - i
+            invariant i <= n;
+            invariant forall j:nat :: j<i ==> lista[j] != x;
+            invariant ConjuntoValido();
                 {
                     if (lista[i] == x) {
                         return;
@@ -91,6 +94,72 @@ class Conjunto {
 
                 conjunto := conjunto + { x };
         }
+
+    method size() returns (n:int)
+        requires ConjuntoValido();
+        ensures ConjuntoValido();
+        {
+            return lista.Length;
+        }
+
+    method isEmpty() returns (b:bool)
+        requires ConjuntoValido();
+        ensures ConjuntoValido();
+        {
+            if (lista.Length == 0) {
+                return true;
+            }
+            return false;
+        }
+
+    method remove(x:int) returns (b:bool)
+    requires ConjuntoValido();
+    requires lista.Length > 0;
+    ensures ConjuntoValido();
+    modifies this, lista;
+    {
+        var c:bool := false;
+        var j:nat := 0;
+        
+        while (j < n)
+        invariant 0 <= j <= n
+        decreases n - j
+            {
+            if (lista[j] == x) {
+                c := true;
+            }
+            j := j + 1;
+        }
+
+        if (c == false) {
+            return false;
+        }
+
+        var anew := new int[lista.Length - 1];
+        var i:nat := 0;
+        while (i < lista.Length && lista[i] != x)
+        decreases lista.Length - i
+        invariant 0 <= i < lista.Length
+        {
+            anew[i] := lista[i];
+            i := i + 1;
+        }
+
+        while (i < n)
+        decreases n - i
+        invariant 0 <= i <= lista.Length
+        invariant anew.Length < lista.Length
+        {
+            anew[i - 1] := lista[i];
+            i := i + 1;
+        }
+
+        lista := anew;
+
+        return true;
+
+    }
+
 
 }
 
