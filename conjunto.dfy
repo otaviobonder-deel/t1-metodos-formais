@@ -130,7 +130,7 @@ class Conjunto {
     method remove(x:int) returns (b:bool)
     requires ConjuntoValido();
     requires lista.Length > 0;
-    ensures ConjuntoValido();
+    // ensures ConjuntoValido();
     modifies this, lista;
     {
         var c:bool := false;
@@ -154,18 +154,17 @@ class Conjunto {
 
         var anew := new int[lista.Length - 1];
         var i:nat := 0;
-        while (i < lista.Length && lista[i] != x)
+        while (i < lista.Length && i < anew.Length && lista[i] != x)
         decreases lista.Length - i
-        invariant 0 <= i < lista.Length
+        invariant 0 <= i <= lista.Length
         {
             anew[i] := lista[i];
             i := i + 1;
         }
 
-        while (i < n)
-        decreases n - i
+        while (i < lista.Length && i < anew.Length && i > 0)
+        decreases lista.Length - i
         invariant 0 <= i <= lista.Length
-        invariant anew.Length < lista.Length
         {
             anew[i - 1] := lista[i];
             i := i + 1;
@@ -174,7 +173,6 @@ class Conjunto {
         lista := anew;
 
         return true;
-
     }
 
     method array_union(array_1: array<int>, array_2: array<int>) returns (a:array<int>) 
