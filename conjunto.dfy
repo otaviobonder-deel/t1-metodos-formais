@@ -343,11 +343,33 @@ class Conjunto {
 
 method Main()
     {
-        var conj1 := new Conjunto() ;
+        var conj1 := new Conjunto();
 
-        conj1.add(3) ;
+        conj1.add(3);
 
-        var b := conj1.contains(3) ;
+        var b := conj1.contains(3);
         assert b == true ;
+
+        var c := conj1.remove(3);
+        assert c == true;
+
+        conj1.add(4);
+
+        var d := conj1.size();
+        assert d == 1;
+
+        var e := conj1.isEmpty();
+        assert e == false;
+
+        var conj2 := new Conjunto();
+        var conj3 := new Conjunto();
+
+        conj2.add(2);
+        conj2.add(3);
+        
+        conj3.add(4);
+        conj3.add(5);
+
+        var conj4 := conj2.conjunto_union(conj3);
 
     }
